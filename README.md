@@ -28,11 +28,46 @@ docs/           Kiến trúc, quy tắc nghiệp vụ, API contract
 | Lan | Backend + Database |
 | Hà | QA + DevOps |
 
-## Chạy dự án
+## Chạy dự án bằng Docker (khuyến nghị)
+
+Yêu cầu Docker Engine có Docker Compose v2.
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
+Sau khi các container chuyển sang trạng thái `healthy`:
+
+- Frontend: http://localhost:5173
+- Backend health check: http://localhost:3000/api/health
+- PostgreSQL: `localhost:5432` (thông tin kết nối lấy từ `.env`)
+
+Mã nguồn frontend và backend được mount vào container nên thay đổi sẽ được tự động tải lại. Khi thay đổi dependency trong `package.json`, chạy lại `docker compose up --build`.
+
+Dừng môi trường mà vẫn giữ dữ liệu PostgreSQL:
+
+```bash
+docker compose down
+```
+
+Dữ liệu PostgreSQL nằm trong named volume `smartcampus-service-desk_postgres_data`, vì vậy không bị mất khi container khởi động lại hoặc khi chạy `docker compose down`. Chỉ xóa dữ liệu khi thực sự muốn tạo lại database từ đầu:
+
+```bash
+docker compose down --volumes
+```
+
+Không commit file `.env`. Chỉ `.env.example` chứa cấu hình mẫu được lưu trong repository.
+
+## Chạy trực tiếp bằng Node.js
 
 Yêu cầu Node.js 22+ và npm 10+.
 
+Khi chạy không qua Docker, sao chép file môi trường mẫu cho từng ứng dụng trước khi khởi động:
+
 ```bash
+cp apps/api/.env.example apps/api/.env
+cp apps/web/.env.example apps/web/.env
 npm install
 npm run dev
 ```
