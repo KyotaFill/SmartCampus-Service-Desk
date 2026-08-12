@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from '../auth/context.js';
 import DashboardSidebar from '../components/DashboardSidebar.jsx';
 import Icon from '../components/Icon.jsx';
 
@@ -16,7 +17,17 @@ const tickets = [
 ];
 
 export default function DashboardPage() {
+  const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const initials = user.fullName
+    .split(/\s+/)
+    .slice(-2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase();
+  const firstName = user.fullName.split(/\s+/).at(-1);
+  const roleLabel = { STUDENT: 'Sinh viên', STAFF: 'Nhân viên', ADMIN: 'Quản trị viên' }[user.role] ?? user.role;
 
   return (
     <div className="dashboard-layout">
@@ -44,9 +55,23 @@ export default function DashboardPage() {
               <span />
             </button>
             <div className="user-menu">
-              <div className="avatar">NK</div>
-              <div className="user-menu__text"><strong>Nguyễn Minh Kiên</strong><small>Quản trị viên</small></div>
-              <span className="user-menu__chevron">⌄</span>
+              <button
+                className="user-menu__trigger"
+                type="button"
+                onClick={() => setUserMenuOpen((open) => !open)}
+                aria-expanded={userMenuOpen}
+                aria-controls="user-menu-panel"
+              >
+                <span className="avatar">{initials}</span>
+                <span className="user-menu__text"><strong>{user.fullName}</strong><small>{roleLabel}</small></span>
+                <span className="user-menu__chevron">⌄</span>
+              </button>
+              {userMenuOpen && (
+                <div className="user-menu__panel" id="user-menu-panel">
+                  <span>{user.email}</span>
+                  <button type="button" onClick={logout}><Icon name="logout" size={17} />Đăng xuất</button>
+                </div>
+              )}
             </div>
           </div>
         </header>
@@ -55,7 +80,7 @@ export default function DashboardPage() {
           <div className="page-heading">
             <div>
               <p className="eyebrow">Thứ Tư, 12 tháng 8</p>
-              <h1>Chào buổi sáng, Kiên!</h1>
+              <h1>Chào buổi sáng, {firstName}!</h1>
               <p>Đây là tình hình hỗ trợ trong khuôn viên hôm nay.</p>
             </div>
             <button className="primary-button primary-button--compact" type="button" title="Sẽ được phát triển ở bước tiếp theo"><Icon name="plus" size={18} />Tạo yêu cầu</button>
