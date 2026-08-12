@@ -1,0 +1,46 @@
+name: Task đồ án
+description: Tạo task từ product backlog
+title: "[IT-XXX] "
+labels: ["task"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Mô tả
+      description: Chức năng hoặc kết quả cần tạo ra.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Liệt kê các điều kiện có thể kiểm tra được.
+      placeholder: |
+        - [ ] Điều kiện 1
+        - [ ] Điều kiện 2
+    validations:
+      required: true
+  - type: input
+    id: dependency
+    attributes:
+      label: Dependency
+      placeholder: IT-XXX hoặc Không có
+  - type: dropdown
+    id: sprint
+    attributes:
+      label: Sprint
+      options:
+        - Sprint 1
+        - Sprint 2
+        - Sprint 3
+        - Sprint 4
+    validations:
+      required: true
+  - type: input
+    id: branch
+    attributes:
+      label: Branch dự kiến
+      placeholder: feat/it-xxx-ten-task
+    validations:
+      required: true
+

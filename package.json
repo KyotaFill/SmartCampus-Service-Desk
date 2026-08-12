@@ -1,0 +1,17 @@
+{
+  "name": "smartcampus-service-desk",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n WEB,API -c cyan,green \"npm run dev -w @smartcampus/web\" \"npm run dev -w @smartcampus/api\"",
+    "build": "npm run build -w @smartcampus/web && npm run build -w @smartcampus/api",
+    "test": "npm run test -w @smartcampus/web && npm run test -w @smartcampus/api",
+    "lint": "npm run lint -w @smartcampus/web && npm run lint -w @smartcampus/api"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.4"
+  }
+}
