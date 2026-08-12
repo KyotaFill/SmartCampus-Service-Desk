@@ -75,6 +75,19 @@ npm run dev
 - Frontend: http://localhost:5173
 - Backend health check: http://localhost:3000/api/health
 
+## Khởi tạo database
+
+Sau khi PostgreSQL chạy và `apps/api/.env` có `DATABASE_URL` hợp lệ:
+
+```bash
+npm run prisma:generate -w @smartcampus/api
+npm run prisma:migrate:deploy -w @smartcampus/api
+npm run prisma:seed -w @smartcampus/api
+```
+
+Khi phát triển một thay đổi schema mới, dùng
+`npm run prisma:migrate:dev -w @smartcampus/api` để tạo migration tiếp theo.
+
 ## Quy trình đóng góp
 
 Đọc [CONTRIBUTING.md](CONTRIBUTING.md) trước khi nhận task. Không push trực tiếp vào `main` hoặc `develop`.
