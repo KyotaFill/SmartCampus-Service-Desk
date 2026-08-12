@@ -13,7 +13,7 @@ export default function DashboardSidebar({ open, onClose }) {
   return (
     <>
       {open && <button className="sidebar-backdrop" type="button" onClick={onClose} aria-label="Đóng menu" />}
-      <aside className={`sidebar${open ? ' sidebar--open' : ''}`}>
+      <aside id="dashboard-sidebar" className={`sidebar${open ? ' sidebar--open' : ''}`}>
         <div className="sidebar__brand">
           <AppLogo />
           <button className="icon-button sidebar__close" type="button" onClick={onClose} aria-label="Đóng menu">

@@ -23,7 +23,14 @@ export default function DashboardPage() {
       <DashboardSidebar open={menuOpen} onClose={() => setMenuOpen(false)} />
       <div className="dashboard-main">
         <header className="topbar">
-          <button className="icon-button topbar__menu" type="button" onClick={() => setMenuOpen(true)} aria-label="Mở menu">
+          <button
+            className="icon-button topbar__menu"
+            type="button"
+            onClick={() => setMenuOpen(true)}
+            aria-label="Mở menu"
+            aria-expanded={menuOpen}
+            aria-controls="dashboard-sidebar"
+          >
             <Icon name="menu" />
           </button>
           <div className="topbar__search">
