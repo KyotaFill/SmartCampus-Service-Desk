@@ -43,6 +43,8 @@ Sau khi các container chuyển sang trạng thái `healthy`:
 - Backend health check: http://localhost:3000/api/health
 - PostgreSQL: `localhost:5432` (thông tin kết nối lấy từ `.env`)
 
+Trước khi API server nhận request, container sẽ tự động generate Prisma Client, chạy các migration chưa áp dụng và seed dữ liệu nền theo cách idempotent. Vì vậy môi trường cũng khởi động được từ database volume trống.
+
 Mã nguồn frontend và backend được mount vào container nên thay đổi sẽ được tự động tải lại. Khi thay đổi dependency trong `package.json`, chạy lại `docker compose up --build`.
 
 Dừng môi trường mà vẫn giữ dữ liệu PostgreSQL:

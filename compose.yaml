@@ -27,7 +27,8 @@ services:
     environment:
       PORT: 3000
       DATABASE_URL: postgresql://${POSTGRES_USER:-smartcampus}:${POSTGRES_PASSWORD:-smartcampus}@postgres:5432/${POSTGRES_DB:-smartcampus}
-      JWT_SECRET: ${JWT_SECRET:-development-only-change-me}
+      JWT_SECRET: ${JWT_SECRET:-development-only-change-me-32-characters}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-3600}
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
     ports:
       - "${API_PORT:-3000}:3000"
@@ -58,6 +59,7 @@ services:
       - "${WEB_PORT:-5173}:5173"
     volumes:
       - ./apps/web:/app/apps/web
+      - /app/apps/web/node_modules
     depends_on:
       api:
         condition: service_healthy

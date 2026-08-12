@@ -13,4 +13,4 @@ WORKDIR /app/apps/api
 
 EXPOSE 3000
 
-CMD ["node", "--watch", "src/server.js"]
+CMD ["sh", "docker-entrypoint.sh"]
