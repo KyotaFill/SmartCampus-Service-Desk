@@ -1,17 +1,24 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { ApiError } from '../api/client.js';
+import { useAuth } from '../auth/context.js';
 import Icon from './Icon.jsx';
 
 export default function LoginForm() {
+  const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
+  const [submitError, setSubmitError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const email = form.get('email').trim();
     const password = form.get('password');
+    const remember = form.get('remember') === 'on';
     const nextErrors = {};
 
     if (!email) nextErrors.email = 'Vui lòng nhập email trường.';
@@ -19,7 +26,27 @@ export default function LoginForm() {
     if (!password) nextErrors.password = 'Vui lòng nhập mật khẩu.';
 
     setErrors(nextErrors);
-    if (Object.keys(nextErrors).length === 0) navigate('/dashboard');
+    setSubmitError('');
+    if (Object.keys(nextErrors).length > 0) return;
+
+    setSubmitting(true);
+    try {
+      await login({ email, password }, remember);
+      const destination = location.state?.from?.pathname ?? '/dashboard';
+      navigate(destination, { replace: true });
+    } catch (error) {
+      if (error instanceof ApiError) {
+        const fieldErrors = Object.fromEntries(
+          (error.details ?? []).map((detail) => [detail.field, detail.message])
+        );
+        setErrors(fieldErrors);
+        setSubmitError(error.message);
+      } else {
+        setSubmitError('Đã xảy ra lỗi. Vui lòng thử lại.');
+      }
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -70,12 +97,12 @@ export default function LoginForm() {
         <span>Ghi nhớ đăng nhập trên thiết bị này</span>
       </label>
 
-      <button className="primary-button" type="submit">
-        Đăng nhập
-        <Icon name="arrow" size={18} />
-      </button>
+      {submitError && <p className="form-alert" role="alert">{submitError}</p>}
 
-      <p className="form-note">Bản giao diện thử nghiệm · Chưa kết nối Auth API</p>
+      <button className="primary-button" type="submit" disabled={submitting} aria-busy={submitting}>
+        {submitting ? 'Đang đăng nhập…' : 'Đăng nhập'}
+        {!submitting && <Icon name="arrow" size={18} />}
+      </button>
     </form>
   );
 }
