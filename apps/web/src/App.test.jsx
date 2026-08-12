@@ -101,16 +101,39 @@ describe('authentication flow', () => {
     expect(headers.get('authorization')).toBe('Bearer saved-token');
   });
 
-  it('clears an invalid saved session and returns to login', async () => {
+  it.each([401, 403])('clears a saved session rejected with %s and returns to login', async (status) => {
     saveSession({ token: 'expired-token', user }, true);
     fetch.mockResolvedValueOnce(response({
       error: { code: 'UNAUTHORIZED', message: 'Phiên đăng nhập không còn hợp lệ' }
-    }, 401));
+    }, status));
 
     renderApp('/dashboard');
 
     expect(await screen.findByRole('heading', { name: 'Đăng nhập vào hệ thống' })).toBeInTheDocument();
     await waitFor(() => expect(localStorage.getItem(SESSION_KEY)).toBeNull());
+  });
+
+  it.each([
+    ['network error', () => Promise.reject(new TypeError('Failed to fetch'))],
+    ['server error', () => Promise.resolve(response({
+      error: { code: 'INTERNAL_ERROR', message: 'Đã xảy ra lỗi hệ thống' }
+    }, 500))]
+  ])('keeps the saved session on a temporary %s and allows retry', async (_label, firstResponse) => {
+    saveSession({ token: 'saved-token', user }, true);
+    fetch
+      .mockImplementationOnce(firstResponse)
+      .mockResolvedValueOnce(response({ user }));
+    renderApp('/dashboard');
+
+    expect(await screen.findByRole('heading', { name: 'Chưa thể kiểm tra phiên đăng nhập' })).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent('Vui lòng kiểm tra kết nối và thử lại');
+    expect(JSON.parse(localStorage.getItem(SESSION_KEY))).toEqual({ token: 'saved-token', user });
+
+    await userEvent.click(screen.getByRole('button', { name: 'Thử lại' }));
+
+    expect(await screen.findByRole('heading', { name: 'Chào buổi sáng, An!' })).toBeInTheDocument();
+    expect(JSON.parse(localStorage.getItem(SESSION_KEY))).toEqual({ token: 'saved-token', user });
+    expect(fetch).toHaveBeenCalledTimes(2);
   });
 
   it('shows the API error and keeps the visitor on login', async () => {
